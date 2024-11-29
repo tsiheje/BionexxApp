@@ -17,7 +17,7 @@ export default function HomeScreen() {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: '#f0f0f0' }]}>
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
+          source={require('@/assets/images/logo_bxx.png')}
           style={styles.reactLogo}
         />
       </View>
@@ -35,15 +35,14 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'center', // Centrer verticalement
+    alignItems: 'center',     // Centrer horizontalement
+    backgroundColor: '#f0f0f0', // Ajout pour garantir un fond clair
   },
   reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    height: 120, // Taille réduite
+    width: 200,  // Taille réduite pour conserver les proportions
+    resizeMode: 'contain', // S'assure que le logo conserve ses proportions
   },
   mainContainer: {
     flex: 1,
@@ -59,3 +58,4 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
+  

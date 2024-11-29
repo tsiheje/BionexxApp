@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, TextInput, Button, Image } from 'react-native';
-import * as ImagePicker from 'expo-image-picker'; 
+import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
-
-interface Cueilleur {
-  id: number;
-  name: string;
-  type: string;
-}
+import * as MediaLibrary from 'expo-media-library';
 
 export default function SearchableCueilleurSelection() {
-  const [selectedCueilleur, setSelectedCueilleur] = useState<string>('');  
+  const [selectedCueilleur, setSelectedCueilleur] = useState<string>('');
   const [selectedType, setSelectedType] = useState<string>('principal');
-  const [photo, setPhoto] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [image, setImage] = useState<string | null>(null); 
+  const [image, setImage] = useState<string | null>(null);
 
   const requestCameraPermission = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -39,7 +33,7 @@ export default function SearchableCueilleurSelection() {
     });
 
     if (!result.canceled && result.assets && result.assets[0]) {
-      setImage(result.assets[0].uri); 
+      setImage(result.assets[0].uri);
     }
   };
 
@@ -49,29 +43,37 @@ export default function SearchableCueilleurSelection() {
 
   const handleSelectType = (type: string) => {
     setSelectedType(type);
-    setSelectedCueilleur(''); 
+    setSelectedCueilleur('');
   };
 
-  const savePhoto = async () => {
-    if (image && typeof image === 'string') {  
+  const saveToGallery = async () => {
+    if (image) {
       if (!selectedCueilleur) {
         Alert.alert('Erreur', 'Veuillez entrer un code de cueilleur.');
         return;
       }
   
-      const prefix = selectedType === 'principal' ? 'P' : 'S'; 
-      const fileName = `${prefix}_${selectedCueilleur}.jpg`; 
-      const fileUri = FileSystem.documentDirectory + fileName; 
+      const prefix = selectedType === 'principal' ? 'P' : 'S';
+      const fileName = `${prefix}_${selectedCueilleur}.jpg`;
+      const fileUri = FileSystem.cacheDirectory + fileName;
   
       try {
         await FileSystem.copyAsync({
           from: image,
           to: fileUri,
         });
-        Alert.alert('Succès', `Image enregistrée sous le nom : ${fileName}`);
+  
+        const permission = await MediaLibrary.requestPermissionsAsync();
+        if (permission.granted) {
+          const asset = await MediaLibrary.createAssetAsync(fileUri);
+          await MediaLibrary.createAlbumAsync('BionexxApp', asset, false);
+          Alert.alert('Succès', `Photo enregistrée dans la galerie sous le nom : ${fileName}`);
+        } else {
+          Alert.alert('Permission refusée', 'Vous devez autoriser l\'accès à la galerie.');
+        }
       } catch (error) {
-        console.error('Erreur lors de l\'enregistrement de l\'image', error);
-        Alert.alert('Erreur', 'Impossible d\'enregistrer l\'image.');
+        console.error('Erreur lors de l\'enregistrement dans la galerie', error);
+        Alert.alert('Erreur', 'Impossible d\'enregistrer la photo dans la galerie.');
       }
     } else {
       Alert.alert('Aucune photo', 'Veuillez d\'abord prendre une photo.');
@@ -83,11 +85,10 @@ export default function SearchableCueilleurSelection() {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Prendre une photo d'un cueilleur</Text>
-
         <View style={styles.card}>
           <View style={styles.typeSelectionContainer}>
             {['principal', 'secondaire'].map((type) => (
-              <TouchableOpacity 
+              <TouchableOpacity
                 key={type}
                 style={[styles.typeButton, selectedType === type && styles.selectedTypeButton]}
                 onPress={() => handleSelectType(type)}
@@ -98,7 +99,6 @@ export default function SearchableCueilleurSelection() {
               </TouchableOpacity>
             ))}
           </View>
-
           <View style={styles.selectContainer}>
             <TextInput
               value={selectedCueilleur}
@@ -107,17 +107,13 @@ export default function SearchableCueilleurSelection() {
               style={styles.textInput}
             />
           </View>
-
           <View style={styles.cameraContainer}>
             <Button title="Ouvrir la caméra" onPress={openCamera} />
-            {image && (
-              <Image source={{ uri: image }} style={styles.image} />
-            )}
+            {image && <Image source={{ uri: image }} style={styles.image} />}
           </View>
-
           <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={savePhoto} style={styles.saveButton}>
-              <Text style={styles.saveButtonText}>Enregistrer</Text>
+            <TouchableOpacity onPress={saveToGallery} style={[styles.saveButton, { backgroundColor: '#007bff' }]}>
+              <Text style={styles.saveButtonText}>Enregistrer dans la galerie</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -129,7 +125,7 @@ export default function SearchableCueilleurSelection() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F9FC', 
+    backgroundColor: '#F7F9FC',
   },
   content: {
     flex: 1,
@@ -142,7 +138,7 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 20,
     textAlign: 'center',
-    fontFamily: 'Arial, sans-serif', 
+    fontFamily: 'Arial, sans-serif',
   },
   card: {
     backgroundColor: '#fff',
@@ -159,7 +155,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 20,
-    backgroundColor: '#F0F4F8', 
+    backgroundColor: '#F0F4F8',
     borderRadius: 30,
     padding: 4,
   },
@@ -169,10 +165,10 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     alignItems: 'center',
     margin: 4,
-    backgroundColor: '#E9ECEF', 
+    backgroundColor: '#E9ECEF',
   },
   selectedTypeButton: {
-    backgroundColor: '#007bff', 
+    backgroundColor: '#007bff',
   },
   typeButtonText: {
     color: '#555',
@@ -195,7 +191,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingLeft: 15,
     fontSize: 16,
-    backgroundColor: '#F9FAFB', 
+    backgroundColor: '#F9FAFB',
   },
   buttonContainer: {
     marginTop: 10,
@@ -210,6 +206,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 5 },
+    marginBottom: 10,
   },
   saveButtonText: {
     color: '#fff',
@@ -225,4 +222,3 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
 });
-
