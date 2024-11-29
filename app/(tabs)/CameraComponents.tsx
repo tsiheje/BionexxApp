@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, Button, Text, Image, StyleSheet } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import React, { useState } from "react";
+import { View, Button, Image, StyleSheet } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 const CameraButton = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -8,7 +8,7 @@ const CameraButton = () => {
 
   const requestCameraPermission = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    setHasPermission(status === 'granted');
+    setHasPermission(status === "granted");
   };
 
   const openCamera = async () => {
@@ -18,7 +18,7 @@ const CameraButton = () => {
     }
 
     if (hasPermission === false) {
-      alert('Permission to access camera is required!');
+      alert("Permission to access camera is required!");
       return;
     }
 
@@ -29,7 +29,7 @@ const CameraButton = () => {
     });
 
     if (!result.canceled && result.assets && result.assets[0]) {
-      setImage(result.assets[0].uri); 
+      setImage(result.assets[0].uri);
     }
   };
 
@@ -48,8 +48,8 @@ const CameraButton = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   image: {
     width: 300,
