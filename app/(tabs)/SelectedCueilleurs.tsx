@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, TextInput, Button, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, TextInput, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
+import { Camera, Image as ImageIcon, X } from 'lucide-react-native';
 
 export default function SearchableCueilleurSelection() {
   const [selectedCueilleur, setSelectedCueilleur] = useState<string>('');
@@ -68,6 +69,8 @@ export default function SearchableCueilleurSelection() {
           const asset = await MediaLibrary.createAssetAsync(fileUri);
           await MediaLibrary.createAlbumAsync('BionexxApp', asset, false);
           Alert.alert('Succès', `Photo enregistrée dans la galerie sous le nom : ${fileName}`);
+          setImage(null);
+          setSelectedCueilleur('');
         } else {
           Alert.alert('Permission refusée', 'Vous devez autoriser l\'accès à la galerie.');
         }
@@ -79,43 +82,84 @@ export default function SearchableCueilleurSelection() {
       Alert.alert('Aucune photo', 'Veuillez d\'abord prendre une photo.');
     }
   };
-  
+
+  const clearImage = () => {
+    setImage(null);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Prendre une photo d'un cueilleur</Text>
+        
         <View style={styles.card}>
           <View style={styles.typeSelectionContainer}>
             {['principal', 'secondaire'].map((type) => (
               <TouchableOpacity
                 key={type}
-                style={[styles.typeButton, selectedType === type && styles.selectedTypeButton]}
+                style={[
+                  styles.typeButton, 
+                  selectedType === type && styles.selectedTypeButton
+                ]}
                 onPress={() => handleSelectType(type)}
               >
-                <Text style={[styles.typeButtonText, selectedType === type && styles.selectedTypeButtonText]}>
+                <Text style={[
+                  styles.typeButtonText, 
+                  selectedType === type && styles.selectedTypeButtonText
+                ]}>
                   {type.charAt(0).toUpperCase() + type.slice(1)}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
-          <View style={styles.selectContainer}>
+
+          <View style={styles.inputContainer}>
             <TextInput
               value={selectedCueilleur}
               onChangeText={handleSelectCueilleur}
               placeholder="Entrez le code d'un cueilleur"
               style={styles.textInput}
+              placeholderTextColor="#888"
             />
           </View>
-          <View style={styles.cameraContainer}>
-            <Button title="Ouvrir la caméra" onPress={openCamera} />
-            {image && <Image source={{ uri: image }} style={styles.image} />}
-          </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={saveToGallery} style={[styles.saveButton, { backgroundColor: '#007bff' }]}>
-              <Text style={styles.saveButtonText}>Enregistrer dans la galerie</Text>
+
+          <TouchableOpacity 
+            style={styles.cameraCard} 
+            onPress={image ? null : openCamera}
+          >
+            {image ? (
+              <View style={styles.imageContainer}>
+                <Image 
+                  source={{ uri: image }} 
+                  style={styles.capturedImage} 
+                  resizeMode="cover" 
+                />
+                <TouchableOpacity 
+                  style={styles.clearImageButton} 
+                  onPress={clearImage}
+                >
+                  <X color="#fff" size={20} />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={styles.cameraPlaceholder}>
+                <Camera color="#007bff" size={50} />
+                <Text style={styles.cameraPlaceholderText}>
+                  Appuyez pour prendre une photo
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+
+          {image && (
+            <TouchableOpacity 
+              onPress={saveToGallery} 
+              style={styles.saveButton}
+            >
+              <ImageIcon color="#fff" size={20} />
+              <Text style={styles.saveButtonText}>Enregistrer</Text>
             </TouchableOpacity>
-          </View>
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -125,37 +169,35 @@ export default function SearchableCueilleurSelection() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: '#f4f6f9',
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingTop: 30,
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#333',
-    marginBottom: 20,
+    color: '#2c3e50',
+    marginBottom: 25,
     textAlign: 'center',
-    fontFamily: 'Arial, sans-serif',
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 10,
+    backgroundColor: '#ffffff',
+    borderRadius: 15,
+    padding: 20,
     shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
     elevation: 8,
   },
   typeSelectionContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 20,
-    backgroundColor: '#F0F4F8',
+    backgroundColor: '#f0f4f8',
     borderRadius: 30,
     padding: 4,
   },
@@ -165,7 +207,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     alignItems: 'center',
     margin: 4,
-    backgroundColor: '#E9ECEF',
+    backgroundColor: '#e9ecef',
   },
   selectedTypeButton: {
     backgroundColor: '#007bff',
@@ -177,48 +219,70 @@ const styles = StyleSheet.create({
   selectedTypeButtonText: {
     color: '#fff',
   },
-  cameraContainer: {
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  selectContainer: {
-    marginBottom: 10,
+  inputContainer: {
+    marginBottom: 20,
   },
   textInput: {
-    height: 45,
-    borderColor: '#ccc',
-    borderWidth: 1.5,
-    borderRadius: 12,
-    paddingLeft: 15,
+    height: 50,
+    borderColor: '#e0e0e0',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 15,
     fontSize: 16,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#f9fafb',
   },
-  buttonContainer: {
-    marginTop: 10,
+  cameraCard: {
+    backgroundColor: '#f0f4f8',
+    borderRadius: 15,
+    height: 300,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    overflow: 'hidden',
+  },
+  cameraPlaceholder: {
+    justifyContent: 'center',
     alignItems: 'center',
   },
+  cameraPlaceholderText: {
+    marginTop: 15,
+    color: '#007bff',
+    fontSize: 16,
+  },
+  imageContainer: {
+    width: '100%',
+    height: '100%',
+    position: 'relative',
+  },
+  capturedImage: {
+    width: '100%',
+    height: '100%',
+  },
+  clearImageButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 20,
+    padding: 5,
+  },
   saveButton: {
-    backgroundColor: '#28a745',
-    paddingVertical: 14,
-    paddingHorizontal: 45,
-    borderRadius: 30,
-    elevation: 4,
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 5 },
-    marginBottom: 10,
+    flexDirection: 'row',
+    backgroundColor: '#007bff',
+    paddingVertical: 15,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#007bff',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
   },
   saveButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
-  },
-  image: {
-    width: 300,
-    height: 300,
-    marginTop: 10,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#ddd',
+    fontWeight: '600',
+    marginLeft: 10,
   },
 });
