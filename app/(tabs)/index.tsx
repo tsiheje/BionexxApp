@@ -15,7 +15,7 @@ export default function HomeScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: '#f0f0f0' }]}>
+      <View style={[styles.loadingContainer]}>
         <Image
           source={require('@/assets/images/logo_bxx.png')}
           style={styles.reactLogo}
@@ -27,7 +27,6 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.mainContainer}>
       <SelectedCueilleurs/>
-      {/* <CameraComponent/> */}
     </ThemedView>
   );
 }
@@ -35,14 +34,14 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center', // Centrer verticalement
-    alignItems: 'center',     // Centrer horizontalement
-    backgroundColor: '#f0f0f0', // Ajout pour garantir un fond clair
+    justifyContent: 'center',
+    alignItems: 'center',     
+    backgroundColor: '#038a1b',
   },
   reactLogo: {
-    height: 120, // Taille réduite
-    width: 200,  // Taille réduite pour conserver les proportions
-    resizeMode: 'contain', // S'assure que le logo conserve ses proportions
+    height: 120, 
+    width: 200,  
+    resizeMode: 'contain', 
   },
   mainContainer: {
     flex: 1,
@@ -58,4 +57,4 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
-  
+

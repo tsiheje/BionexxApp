@@ -114,18 +114,19 @@ export default function SearchableCueilleurSelection() {
           </View>
 
           <View style={styles.inputContainer}>
-            <TextInput
-              value={selectedCueilleur}
-              onChangeText={handleSelectCueilleur}
-              placeholder="Entrez le code d'un cueilleur"
-              style={styles.textInput}
-              placeholderTextColor="#888"
-            />
+          <TextInput
+            value={selectedCueilleur}
+            onChangeText={handleSelectCueilleur}
+            placeholder="Entrez le code d'un cueilleur"
+            style={styles.textInput}
+            placeholderTextColor="#888"
+            maxLength={9}
+          />
           </View>
 
           <TouchableOpacity 
             style={styles.cameraCard} 
-            onPress={image ? null : openCamera}
+            onPress={image ? undefined : openCamera}
           >
             {image ? (
               <View style={styles.imageContainer}>

@@ -4,22 +4,26 @@
     "slug": "BionexxApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo_bxx.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "This app requires camera access to take photos."
-      }
+      },
+      "bundleIdentifier": "com.mickaelio.BionexxApp"
     },
     "android": {
-      "permissions": ["CAMERA"],
+      "permissions": [
+        "CAMERA"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.mickaelio.BionexxApp"
     },
     "web": {
       "bundler": "metro",
@@ -40,6 +44,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "897bee8a-6a0a-4b51-bb40-dae4ef627e75"
+      }
+    },
+    "owner": "mickaelio"
   }
 }
