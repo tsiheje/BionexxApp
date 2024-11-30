@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "BionexxApp",
-    "slug": "BionexxApp",
+    "slug": "app-cam-bionexx",
+    "platforms": ["ios", "android"],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo_bxx.png",
@@ -16,9 +17,7 @@
       "bundleIdentifier": "com.mickaelio.BionexxApp"
     },
     "android": {
-      "permissions": [
-        "CAMERA"
-      ],
+      "permissions": ["CAMERA"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -50,9 +49,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "897bee8a-6a0a-4b51-bb40-dae4ef627e75"
+        "projectId": "7617ac7c-cd02-47a5-b3bb-219318988ea1"
       }
     },
-    "owner": "mickaelio"
+    "owner": "devit17"
   }
 }
