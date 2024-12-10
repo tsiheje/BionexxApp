@@ -17,7 +17,8 @@ export default function ScannerQR() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Scanner le QRcode d'un cueilleur</Text>
+        <Text style={styles.title}>Scanner QRcode d'un cueilleur</Text>
+
       </View>
     </SafeAreaView>
   );

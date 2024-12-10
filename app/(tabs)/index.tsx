@@ -4,25 +4,6 @@ import { ThemedView } from "@/components/ThemedView";
 import SelectedCueilleurs from "../../components/SelectedCueilleurs";
 
 export default function HomeScreen() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <View style={[styles.loadingContainer]}>
-        <Image
-          source={require("@/assets/images/logo_bxx.png")}
-          style={styles.reactLogo}
-        />
-      </View>
-    );
-  }
-
   return (
     <ThemedView style={styles.mainContainer}>
       <SelectedCueilleurs />
