@@ -13,7 +13,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import { Camera, Image as ImageIcon, X } from "lucide-react-native";
-import logo from "../../assets/images/logo_bxx.png";
+import logo from "../assets/images/logo_bxx.png";
 
 export default function SearchableCueilleurSelection() {
   const [selectedCueilleur, setSelectedCueilleur] = useState<string>("");

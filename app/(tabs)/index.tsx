@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
-import SelectedCueilleurs from "./SelectedCueilleurs";
+import SelectedCueilleurs from "../../components/SelectedCueilleurs";
 
 export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(true);
