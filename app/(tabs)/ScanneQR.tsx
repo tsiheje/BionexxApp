@@ -5,16 +5,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
-  Alert,
   Linking,
+  ScrollView,
 } from "react-native";
 import { Camera, CameraView } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function ScannerQR() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scanned, setScanned] = useState(false);
-  const [facing, setFacing] = useState<"back" | "front">("back");
+  const [scannedData, setScannedData] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -23,24 +22,22 @@ export default function ScannerQR() {
     })();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
-    setScanned(true);
-    Alert.alert(
-      "QR Code Scanned",
-      `Type: ${type}\nContent: ${data}`,
-      [
-        {
-          text: "OK",
-          onPress: () => setScanned(false),
-        },
-      ]
-    );
+  const handleBarcodeScan = (scanResult: { data: string }) => {
+    // Store the scanned data
+    setScannedData(scanResult.data);
   };
 
-  const toggleCameraFacing = () => {
-    setFacing((current) => (current === "back" ? "front" : "back"));
+  const handleOpenLink = () => {
+    if (scannedData) {
+      Linking.openURL(scannedData);
+    }
   };
 
+  const resetScanner = () => {
+    setScannedData(null);
+  };
+
+  // If permission is not granted
   if (hasPermission === null) {
     return (
       <SafeAreaView style={styles.container}>
@@ -57,28 +54,57 @@ export default function ScannerQR() {
     );
   }
 
+  // If no scan has happened yet
+  if (!scannedData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.content}>
+          <Text style={styles.title}>Scanner le QRcode d'un cueilleur</Text>
+          <View style={styles.cameraCard}>
+            <CameraView
+              style={StyleSheet.absoluteFillObject}
+              facing="back"
+              onBarcodeScanned={handleBarcodeScan}
+            >
+              <View style={styles.cameraOverlay}>
+                {/* You can add additional camera overlay elements here */}
+              </View>
+            </CameraView>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Scanner le QRcode d'un cueilleur</Text>
-        <View style={styles.cameraCard}>
-          <CameraView
-            style={StyleSheet.absoluteFillObject}
-            facing="back"
-            onBarcodeScanned={({data})=> {
-              Linking.openURL(data)
-            }}
-          >
-            <View style={styles.cameraOverlay}>
-            </View>
-          </CameraView>
+      <ScrollView contentContainerStyle={styles.resultsContainer}>
+        <Text style={styles.title}>Information du cueilleur</Text>
+        <View style={styles.infocontent}>
+          <View style={styles.infocard}>
+
+          </View>
+          <View>
+            <Text>C20100010</Text>
+            <Text>Rasolofoniaina</Text>
+            <Text>Marie Mickaelio</Text>
+            <Text>0342341566</Text>
+          </View>
         </View>
-        {scanned && (
-          <TouchableOpacity style={styles.saveButton} onPress={() => setScanned(false)}>
-            <Text style={styles.saveButtonText}>Scan Again</Text>
+        <View style={styles.resultCard}>
+          <Text style={styles.resultLabel}>Total Poids</Text>
+          <Text style={styles.resultText}>Total Achat</Text>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={styles.scanAgainButton} 
+            onPress={resetScanner}
+          >
+            <Text style={styles.buttonText}>Scanner à Nouveau</Text>
           </TouchableOpacity>
-        )}
-      </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -86,6 +112,7 @@ export default function ScannerQR() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    margin:-15,
     backgroundColor: "#f5f5f5",
   },
   content: {
@@ -97,6 +124,27 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 20,
+  },
+  infocontent: {
+    width: "90%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 30,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  infocard : {
+    width: 100,
+    height: 100,
+    borderRadius : 50,
+    backgroundColor: "red"
   },
   cameraCard: {
     width: "90%",
@@ -117,18 +165,62 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     padding: 20,
   },
-  cameraToggleButton: {
-    backgroundColor: "rgba(0,0,0,0.5)",
-    borderRadius: 30,
-    padding: 10,
+  resultsContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
   },
-  saveButton: {
-    marginTop: 20,
+  resultsTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 30,
+    color: "#333",
+  },
+  resultCard: {
+    width: "90%",
+    backgroundColor: "white",
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 30,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  resultLabel: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 10,
+  },
+  resultText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "90%",
+  },
+  openButton: {
+    flex: 1,
     backgroundColor: "#007bff",
     padding: 15,
     borderRadius: 10,
+    marginRight: 10,
   },
-  saveButtonText: {
+  scanAgainButton: {
+    flex: 1,
+    backgroundColor: "#28a745",
+    padding: 15,
+    borderRadius: 10,
+  },
+  buttonText: {
     color: "white",
     fontSize: 16,
     textAlign: "center",
