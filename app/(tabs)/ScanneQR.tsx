@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,19 +6,78 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
-  TextInput,
-  Image,
+  Linking,
 } from "react-native";
-
+import { Camera, CameraView } from "expo-camera";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function ScannerQR() {
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [scanned, setScanned] = useState(false);
+  const [facing, setFacing] = useState<"back" | "front">("back");
 
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
+    setScanned(true);
+    Alert.alert(
+      "QR Code Scanned",
+      `Type: ${type}\nContent: ${data}`,
+      [
+        {
+          text: "OK",
+          onPress: () => setScanned(false),
+        },
+      ]
+    );
+  };
+
+  const toggleCameraFacing = () => {
+    setFacing((current) => (current === "back" ? "front" : "back"));
+  };
+
+  if (hasPermission === null) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.errorText}>Requesting camera permission...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (hasPermission === false) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.errorText}>No access to camera</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Scanner QRcode d'un cueilleur</Text>
-
+        <Text style={styles.title}>Scanner le QRcode d'un cueilleur</Text>
+        <View style={styles.cameraCard}>
+          <CameraView
+            style={StyleSheet.absoluteFillObject}
+            facing="back"
+            onBarcodeScanned={({data})=> {
+              Linking.openURL(data)
+            }}
+          >
+            <View style={styles.cameraOverlay}>
+            </View>
+          </CameraView>
+        </View>
+        {scanned && (
+          <TouchableOpacity style={styles.saveButton} onPress={() => setScanned(false)}>
+            <Text style={styles.saveButtonText}>Scan Again</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -27,127 +86,51 @@ export default function ScannerQR() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f4f6f9",
+    backgroundColor: "#f5f5f5",
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 30,
-  },
-  logo: {
-    width: 130,
-    height: 130,
-    resizeMode: "contain",
-    alignSelf: "center",
-    marginBottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#2c3e50",
-    marginBottom: 25,
-    textAlign: "center",
-  },
-  card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 15,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 10,
-  },
-  typeSelectionContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
+    fontSize: 18,
+    fontWeight: "bold",
     marginBottom: 20,
-    backgroundColor: "#f0f4f8",
-    borderRadius: 10,
-    padding: 4,
-  },
-  typeButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    margin: 4,
-    backgroundColor: "#e9ecef",
-  },
-  selectedTypeButton: {
-    backgroundColor: "#669D31",
-  },
-  typeButtonText: {
-    color: "#000",
-    fontWeight: "600",
-  },
-  selectedTypeButtonText: {
-    color: "#fff",
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  textInput: {
-    height: 50,
-    borderColor: "#e0e0e0",
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    backgroundColor: "#f9fafb",
   },
   cameraCard: {
-    backgroundColor: "#f0f4f8",
-    borderRadius: 15,
-    height: 300,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
+    width: "90%",
+    height: "60%",
     overflow: "hidden",
-  },
-  cameraPlaceholder: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  cameraPlaceholderText: {
-    marginTop: 15,
-    color: "#4D5156",
-    fontSize: 16,
-  },
-  imageContainer: {
-    width: "100%",
-    height: "100%",
-    position: "relative",
-  },
-  capturedImage: {
-    width: "100%",
-    height: "100%",
-  },
-  clearImageButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: 20,
-    padding: 5,
+    backgroundColor: "#000",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 20,
+  },
+  cameraOverlay: {
+    flex: 1,
+    backgroundColor: "transparent",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    padding: 20,
+  },
+  cameraToggleButton: {
+    backgroundColor: "rgba(0,0,0,0.5)",
+    borderRadius: 30,
+    padding: 10,
   },
   saveButton: {
-    flexDirection: "row",
-    backgroundColor: "#666664",
-    paddingVertical: 15,
+    marginTop: 20,
+    backgroundColor: "#007bff",
+    padding: 15,
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#007bff",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
   },
   saveButtonText: {
-    color: "#fff",
+    color: "white",
     fontSize: 16,
-    fontWeight: "600",
-    marginLeft: 10,
+    textAlign: "center",
   },
 });
