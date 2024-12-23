@@ -1,133 +1,164 @@
-  import React, { useState, useEffect } from "react";
-  import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    SafeAreaView,
-    Linking,
-    ScrollView,
-    Image,
-  } from "react-native";
-  import { Camera, CameraView } from "expo-camera";
-  import { Ionicons } from "@expo/vector-icons";
-  import logo from "../../assets/images/logo_bxx.png";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+  Image,
+  ActivityIndicator,
+} from "react-native";
+import { Camera, CameraView } from "expo-camera";
+import { Ionicons } from "@expo/vector-icons";
+import CueilleurService from "../../config/api/MobileService"; 
+import logo from "../../assets/images/logo_bxx.png";
 
-  export default function ScannerQR() {
-    const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-    const [scannedData, setScannedData] = useState<string | null>(null);
+export default function ScannerQR() {
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [scannedData, setScannedData] = useState<string | null>(null);
+  const [cueilleurInfo, setCueilleurInfo] = useState<any | null>(null); 
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [error, setError] = useState<string | null>(null); 
 
-    useEffect(() => {
-      (async () => {
-        const { status } = await Camera.requestCameraPermissionsAsync();
-        setHasPermission(status === "granted");
-      })();
-    }, []);
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+  }, []);
 
-    const handleBarcodeScan = (scanResult: { data: string }) => {
-      setScannedData(scanResult.data);
-    };
+  const handleBarcodeScan = async (scanResult: { data: string }) => {
+    setScannedData(scanResult.data);
+    setLoading(true);
+    setError(null);
 
-    const handleOpenLink = () => {
-      if (scannedData) {
-        Linking.openURL(scannedData);
-      }
-    };
-
-    const resetScanner = () => {
-      setScannedData(null);
-    };
-
-    if (hasPermission === null) {
-      return (
-        <SafeAreaView style={styles.container}>
-          <Text style={styles.errorText}>Demande d'autorisation caméra...</Text>
-        </SafeAreaView>
-      );
+    try {
+      const data = await CueilleurService.getInfoCueilleur(scanResult.data); 
+      setCueilleurInfo(data);
+    } catch (err) {
+      setError("Impossible de récupérer les informations du cueilleur.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (hasPermission === false) {
-      return (
-        <SafeAreaView style={styles.container}>
-          <Text style={styles.errorText}>Aucun accès à la caméra</Text>
-        </SafeAreaView>
-      );
-    }
+  const resetScanner = () => {
+    setScannedData(null);
+    setCueilleurInfo(null);
+    setError(null);
+  };
 
-    if (!scannedData) {
-      return (
-        <SafeAreaView style={styles.container}>
-          <Image source={logo} style={styles.logo} />
-          <View style={styles.content}>
-            <Text style={styles.title}>Scanner le QR code</Text>
-            <View style={styles.cameraContainer}>
-              <CameraView
-                style={StyleSheet.absoluteFillObject}
-                facing="back"
-                onBarcodeScanned={handleBarcodeScan}
-              >
-                <View style={styles.cameraOverlay}>
-                  <View style={styles.scannerFrame} />
-                </View>
-              </CameraView>
-            </View>
-          </View>
-        </SafeAreaView>
-      );
-    }
-
+  if (hasPermission === null) {
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView 
-          contentContainerStyle={styles.resultsContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          <Text style={styles.sectionTitle}>Informations du Cueilleur</Text>
-            <View style={styles.profileAvatar}>
-              <Ionicons name="person" size={50} color="white" />
-            </View>
-        
-          <View style={styles.profileSection}>
-              <View style={styles.profileDetails}>
-                <Text style={styles.profileLabel}>Code</Text>
-                <Text style={styles.profileValue}>C20100010</Text>
-              </View>
-              <View style={styles.profileDetails}>
-                <Text style={styles.profileLabel}>Nom</Text>
-                <Text style={styles.profileValue}>Rasolofoniaina Tsiheje</Text>
-              </View>
-              <View style={styles.profileDetails}>
-                <Text style={styles.profileLabel}>Prénom</Text>
-                <Text style={styles.profileValue}>Marie Mickaelio</Text>
-              </View>
-              <View style={styles.profileDetails}>
-                <Text style={styles.profileLabel}>Téléphone</Text>
-                <Text style={styles.profileValue}>0342341566</Text>
-              </View>
-          </View>
-
-          <View style={styles.statsCard}>
-            <View style={styles.statItem}>
-              <Text style={styles.statLabel}>Total Poids</Text>
-              <Text style={styles.statValue}>500 kg</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statLabel}>Total Achat</Text>
-              <Text style={styles.statValue}>500 000 Ar</Text>
-            </View>
-          </View>
-
-          <TouchableOpacity 
-            style={styles.primaryButton} 
-            onPress={resetScanner}
-          >
-            <Ionicons name="scan" size={20} color="white" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Scanner à Nouveau</Text>
-          </TouchableOpacity>
-        </ScrollView>
+        <Text style={styles.errorText}>Demande d'autorisation caméra...</Text>
       </SafeAreaView>
     );
   }
+
+  if (hasPermission === false) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.errorText}>Aucun accès à la caméra</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (!scannedData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Image source={logo} style={styles.logo} />
+        <View style={styles.content}>
+          <Text style={styles.title}>Scanner le QR code</Text>
+          <View style={styles.cameraContainer}>
+            <CameraView
+              style={StyleSheet.absoluteFillObject}
+              facing="back"
+              onBarcodeScanned={handleBarcodeScan}
+            >
+              <View style={styles.cameraOverlay}>
+                <View style={styles.scannerFrame} />
+              </View>
+            </CameraView>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#3498db" />
+        <Text>Chargement des informations...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.errorText}>{error}</Text>
+        <TouchableOpacity style={styles.primaryButton} onPress={resetScanner}>
+          <Ionicons name="scan" size={20} color="white" style={styles.buttonIcon} />
+          <Text style={styles.buttonText}>Réessayer</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.resultsContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.sectionTitle}>Informations du Cueilleur</Text>
+        {cueilleurInfo && (
+          <>
+            <View style={styles.profileAvatar}>
+              <Ionicons name="person" size={50} color="white" />
+            </View>
+
+            <View style={styles.profileSection}>
+              <View style={styles.profileDetails}>
+                <Text style={styles.profileLabel}>Code</Text>
+                <Text style={styles.profileValue}>{cueilleurInfo.cueilleurPrincipal?.code_cp || "N/A"}</Text>
+              </View>
+              <View style={styles.profileDetails}>
+                <Text style={styles.profileLabel}>Nom</Text>
+                <Text style={styles.profileValue}>{cueilleurInfo.cueilleurPrincipal?.nom || "N/A"}</Text>
+              </View>
+              <View style={styles.profileDetails}>
+                <Text style={styles.profileLabel}>Prénom</Text>
+                <Text style={styles.profileValue}>{cueilleurInfo.cueilleurPrincipal?.prenoms || "N/A"}</Text>
+              </View>
+              <View style={styles.profileDetails}>
+                <Text style={styles.profileLabel}>Surnom</Text>
+                <Text style={styles.profileValue}>{cueilleurInfo.cueilleurPrincipal?.surnoms || "N/A"}</Text>
+              </View>
+            </View>
+
+            <View style={styles.statsCard}>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Total Poids</Text>
+                <Text style={styles.statValue}>{cueilleurInfo.totalPoids || 0} kg</Text>
+              </View>
+            </View>
+          </>
+        )}
+
+        <TouchableOpacity style={styles.primaryButton} onPress={resetScanner}>
+          <Ionicons name="scan" size={20} color="white" style={styles.buttonIcon} />
+          <Text style={styles.buttonText}>Scanner à Nouveau</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
 
   const styles = StyleSheet.create({
     container: {
