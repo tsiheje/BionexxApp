@@ -1,8 +1,7 @@
 import config from "../config";
 
-
 interface CueilleurResponse {
-  // cueilleurPrincipal: Cueilleur | null;
+  //cueilleurPrincipal: Cueilleur | null;
   totalPoids: number;
 }
 
@@ -21,10 +20,13 @@ const CueilleurService = {
       }
 
       const data: CueilleurResponse = await response.json();
-      return data; // Données du cueilleur et poids total
-    } catch (error) {
-      console.error("Erreur lors de la récupération des informations du cueilleur :", error);
-      throw error; // Propager l'erreur pour la gérer dans le composant
+      return data;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Erreur réseau :", error.message);
+        throw new Error("Erreur réseau. Veuillez réessayer.");
+      }
+      throw error;
     }
   },
 };
