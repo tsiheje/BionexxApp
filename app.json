@@ -1,8 +1,11 @@
 {
   "expo": {
     "name": "BionexxApp",
-    "slug": "BionexxApp",
-    "platforms": ["ios", "android"],
+    "slug": "app-mobile-bxx",
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo_bxx.png",
@@ -17,7 +20,9 @@
       "bundleIdentifier": "com.mickaelio.BionexxApp"
     },
     "android": {
-      "permissions": ["CAMERA"],
+      "permissions": [
+        "CAMERA"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -49,9 +54,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "897bee8a-6a0a-4b51-bb40-dae4ef627e75"
+        "projectId": "6e246cf6-2b1f-41fe-b367-bf7976ac4d7f"
       }
     },
-    "owner": "mickaelio"
+    "owner": "devit17"
   }
 }

@@ -8,10 +8,12 @@ import {
   ScrollView,
   Image,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
 import { Camera, CameraView } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 import CueilleurService from "../../config/api/MobileService";
+import { setApiUrl, getApiUrl } from "../../config/config";
 import logo from "../../assets/images/logo_bxx.png";
 
 export default function ScannerQR() {
@@ -20,12 +22,27 @@ export default function ScannerQR() {
   const [cueilleurInfo, setCueilleurInfo] = useState<any | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [ipAddress, setIpAddress] = useState<string>("");
 
   useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === "granted");
     })();
+  }, []);
+
+  const updateIpAddress = async () => {
+    if (!ipAddress) return alert("Veuillez entrer une IP valide.");
+    await setApiUrl(ipAddress);
+    alert("Adresse IP mise à jour !");
+  };
+
+  useEffect(() => {
+    const fetchApiUrl = async () => {
+      const savedApiUrl = await getApiUrl();
+      setIpAddress(savedApiUrl.replace("http://", "").split(":")[0]);
+    };
+    fetchApiUrl();
   }, []);
 
   const handleBarcodeScan = async (scanResult: { data: string }) => {
@@ -82,6 +99,21 @@ export default function ScannerQR() {
                 <View style={styles.scannerFrame} />
               </View>
             </CameraView>
+          </View>
+          <View style={styles.ipContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Entrez l'adresse IP"
+              value={ipAddress}
+              onChangeText={setIpAddress}
+              keyboardType="numeric"
+            />
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={updateIpAddress}
+            >
+              <Text style={styles.buttonText}>Mettre à jour</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </SafeAreaView>
@@ -207,7 +239,7 @@ const styles = StyleSheet.create({
   },
   cameraContainer: {
     width: "100%",
-    height: "80%",
+    height: "60%",
     borderRadius: 25,
     overflow: "hidden",
     backgroundColor: "rgba(255,255,255,0.8)",
@@ -224,8 +256,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(26, 47, 58, 0.1)",
   },
   scannerFrame: {
-    width: "75%",
-    height: "45%",
+    width: "65%",
+    height: "50%",
     borderWidth: 3,
     borderColor: "rgba(255,255,255,0.8)",
     borderRadius: 25,
@@ -350,5 +382,25 @@ const styles = StyleSheet.create({
     fontSize: 18,
     padding: 25,
     fontWeight: "500",
+  },
+  input: {
+    width: "100%",
+    height: 50,
+    backgroundColor: "#fff",
+    paddingHorizontal: 20,
+    fontSize: 16,
+    marginTop: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  ipContainer: {
+    width: "100%",
+    marginTop: 20,
+    marginBottom: 20,
+    alignItems: "center",
   },
 });
