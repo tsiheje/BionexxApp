@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import React from "react";
+import { StyleSheet } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import SelectedCueilleurs from "../../components/SelectedCueilleurs";
 
