@@ -83,14 +83,16 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 android {
     ndkVersion rootProject.ext.ndkVersion
 
-    buildToolsVersion rootProject.ext.buildToolsVersion
-    compileSdk rootProject.ext.compileSdkVersion
+    // buildToolsVersion rootProject.ext.buildToolsVersion
+    // compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.bionexxapp"
+    namespace 'com.mickaelio.BionexxApp'
     defaultConfig {
         applicationId 'com.mickaelio.BionexxApp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        // buildToolsVersion rootProject.ext.buildToolsVersion
+        compileSdk rootProject.ext.compileSdkVersion
         versionCode 1
         versionName "1.0.0"
     }

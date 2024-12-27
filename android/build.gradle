@@ -2,27 +2,28 @@
 
 buildscript {
     ext {
-        buildToolsVersion = findProperty('android.buildToolsVersion') ?: '35.0.0'
-        minSdkVersion = Integer.parseInt(findProperty('android.minSdkVersion') ?: '24')
-        compileSdkVersion = Integer.parseInt(findProperty('android.compileSdkVersion') ?: '35')
-        targetSdkVersion = Integer.parseInt(findProperty('android.targetSdkVersion') ?: '34')
-        kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.24'
-
-        ndkVersion = "26.1.10909125"
+        // buildToolsVersion = findProperty('android.buildToolsVersion') ?: '35.0.0'
+        // minSdkVersion = Integer.parseInt(findProperty('android.minSdkVersion') ?: '24')
+        // compileSdkVersion = Integer.parseInt(findProperty('android.compileSdkVersion') ?: '35')
+        // targetSdkVersion = Integer.parseInt(findProperty('android.targetSdkVersion') ?: '34')
+        //kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.24'
+        compileSdkVersion = 34
+        targetSdkVersion = 34
+        minSdkVersion = 24
+        kotlinVersion = "1.9.24"
+        ndkVersion = "28.0.12674087"
     }
     repositories {
         google()
         mavenCentral()
     }
-    dependencies {
-        classpath('com.android.tools.build:gradle')
-        classpath('com.facebook.react:react-native-gradle-plugin')
-        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
-         implementation project(':react-native-camera') {
-        variant = 'generalReleaseRuntimeElements'  
-    }
+   dependencies {
+    classpath('com.android.tools.build:gradle:8.7.0')
+    classpath('com.facebook.react:react-native-gradle-plugin')
+    classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.24')
     }
 }
+
 
 apply plugin: "com.facebook.react.rootproject"
 
@@ -30,13 +31,8 @@ allprojects {
     repositories {
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url(new File(['node', '--print', "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim(), '../android'))
+            url 'https://maven.google.com'
         }
-        maven {
-            // Android JSC is installed from npm
-            url(new File(['node', '--print', "require.resolve('jsc-android/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim(), '../dist'))
-        }
-
         google()
         mavenCentral()
         maven { url 'https://www.jitpack.io' }
