@@ -24,7 +24,7 @@
         "CAMERA"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/logo_bxx.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.mickaelio.BionexxApp"
