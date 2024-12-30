@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "BionexxApp",
-    "slug": "app-mobile-bxx",
+    "slug": "BionexxApp",
     "platforms": [
       "ios",
       "android"
@@ -55,9 +55,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "6e246cf6-2b1f-41fe-b367-bf7976ac4d7f"
+        "projectId": "897bee8a-6a0a-4b51-bb40-dae4ef627e75"
       }
     },
-    "owner": "devit17"
+    "owner": "mickaelio"
   }
 }
