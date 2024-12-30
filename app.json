@@ -21,7 +21,9 @@
     },
     "android": {
       "permissions": [
-        "CAMERA"
+        "CAMERA",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo_bxx.png",
